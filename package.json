@@ -1,5 +1,5 @@
 {
-  "name": "appnation-case",
+  "name": "weather-api",
   "version": "0.0.1",
   "description": "Weather API with role-based access control and caching",
   "author": "",

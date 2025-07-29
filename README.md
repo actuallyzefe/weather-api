@@ -70,7 +70,7 @@ src/
 
    ```bash
    git clone <repository-url>
-   cd appnation-case
+   cd weather-api
    ```
 
 2. **Environment Setup**
