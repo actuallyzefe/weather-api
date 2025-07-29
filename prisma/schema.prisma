@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  role      UserRole @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  weatherQueries WeatherQuery[]
+  createdUsers   User[]         @relation("UserCreatedBy")
+  createdBy      User?          @relation("UserCreatedBy", fields: [createdById], references: [id])
+  createdById    String?
+
+  @@map("users")
+  @@index([email])
+  @@index([role])
+}
+
+model WeatherQuery {
+  id          String   @id @default(cuid())
+  userId      String
+  city        String
+  country     String?
+  latitude    Float
+  longitude   Float
+  temperature Float
+  description String
+  humidity    Int
+  pressure    Int
+  windSpeed   Float
+  windDeg     Int?
+  visibility  Int?
+  uvIndex     Float?
+  feelsLike   Float
+  icon        String?
+  queryTime   DateTime @default(now())
+  cacheKey    String   @unique
+
+  // Relationships
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("weather_queries")
+  @@index([userId])
+  @@index([city])
+  @@index([queryTime])
+  @@index([cacheKey])
+}
+
+model CacheEntry {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("cache_entries")
+  @@index([key])
+  @@index([expiresAt])
+} 

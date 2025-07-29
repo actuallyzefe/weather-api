@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.env.test
+.git
+.gitignore
+README.md
+Dockerfile
+docker-compose.yml
+.dockerignore
+coverage
+.coverage
+.nyc_output
+*.md
+dist
+.nest-build-info.json 

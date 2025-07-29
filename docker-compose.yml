@@ -1,0 +1,61 @@
+services:
+  app:
+    build: .
+    container_name: weather-api
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://weather_user:weather_pass@db:5432/weather_api?schema=public
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=your-super-secret-jwt-key
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - NODE_ENV=development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./src:/app/src
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    container_name: weather-db
+    environment:
+      POSTGRES_DB: weather_api
+      POSTGRES_USER: weather_user
+      POSTGRES_PASSWORD: weather_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weather_user -d weather_api"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: weather-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  adminer:
+    image: adminer
+    container_name: weather-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data: 
